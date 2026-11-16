@@ -1,0 +1,4 @@
+interface:
+  display_name: "Claude 跨电脑追加迁移"
+  short_description: "通过 OpenSSH 追加迁移旧电脑的 Claude 历史、标题与能力配置"
+  default_prompt: "使用 $claude-to-claude-migrate 从 A 电脑迁移 Claude Code 到 B 电脑，追加历史并保留 B 的现有会话和配置。"
