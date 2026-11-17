@@ -29,6 +29,8 @@ A配置目录：C:\Users\olduser\.claude
 
 更完整的交接提示见 [handoff-to-b.md](references/handoff-to-b.md)，操作约束见 [workflow.md](references/workflow.md)。需要先配置 B → A 的 OpenSSH 公钥认证，并核实主机指纹；私钥留在 B，不要公开凭据。
 
+如果目标机同时安装了多个 Agent（例如 Claude Code、ChatGPT/Codex、WorkBuddy、Devin、AgentCli），使用[通用 Agent 提示词](references/universal-agent-prompt.md)。它要求 Agent 先自识别、安装本 Skill、执行 selftest，再进行 SSH 盘点、plan、追加 apply 和桌面验收；不依赖某个 Agent 的命令格式。目标是官方订阅登录时，提示词还会要求按 B 实际 account/org 目录处理，不复制源机 OAuth 或第三方 API 凭据。
+
 ## 工具与覆盖范围
 
 `scripts/migrate.py` 支持 `inventory`、`export`、`plan`、`apply`。`scripts/pull_from_a.ps1` 自动通过已配置 SSH 别名拉取暂存包，不会自动应用。所有路径使用绝对路径，输出区不能位于源配置或项目内。
