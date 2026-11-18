@@ -56,13 +56,29 @@ scp -o BatchMode=yes A-alias:claude-migrate-run/export/claude-transfer.zip.sha25
 
 ## 桌面Code列表的第二层原生数据
 
-不能只检查`%APPDATA%/Claude`。实际Windows安装可能将数据移到`%LOCALAPPDATA%/Claude-Data/claude_pzs8sxrjxfjjc`，第三方提供商模式可能使用`%LOCALAPPDATA%/Claude-3p`。Appx的`LocalCache/Roaming/Claude`可能只有迁移指向标记，实际数据已不在那里。
+不能只检查`%APPDATA%/Claude`。实际 Windows 安装可能将官方资料移到 `%LOCALAPPDATA%/Claude-Data/claude_pzs8sxrjxfjjc`，第三方模式的资料也可能在打包应用的 `LocalCache/Local/Claude-3p` 内。外层 `%LOCALAPPDATA%/Claude-3p` 和 Appx 的 `LocalCache/Roaming/Claude` 可能只有配置或迁移指向标记，实际列表不在那里。
+
+先区分主历史和桌面索引。以下是一次 Windows 实机上验证过的路径形态，不是所有安装版本的固定路径；从当前进程、用户配置目录及现有文件发现实际根目录：
+
+| 数据 | 已见路径形态 | 核对要点 |
+| --- | --- | --- |
+| Claude Code CLI 主会话及项目 memory | `%USERPROFILE%\.claude\projects\<编码项目目录>\<会话UUID>.jsonl`，同级还有 `memory`、标题和附属目录 | 先查 `CLAUDE_CONFIG_DIR`；同一配置目录可以被 CLI 与桌面 Code 共用，不能按官方/第三方模型凭空分成两份 CLI 历史。 |
+| 第三方模式桌面 Code 列表 | `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Local\Claude-3p\claude-code-sessions\<B账户>\<B组织>\local_<UUID>.json` | 这是一次打包桌面应用的实际目录；外层 `%LOCALAPPDATA%\Claude-3p` 可能仅有配置，没有列表。 |
+| 官方模式桌面 Code 列表 | `%LOCALAPPDATA%\Claude-Data\claude_pzs8sxrjxfjjc\claude-code-sessions\<B账户>\<B组织>\local_<UUID>.json` | 账号/组织必须以 B 官方登录后实际生成的目录为准；不能沿用第三方模式的命名空间。 |
+
+上述三层不是三个可相互替代的会话正文库。桌面 JSON 是标题、时间、cwd、归档状态和 `cliSessionId` 等列表元数据，完整对话仍要用 `cliSessionId` 关联主 JSONL。另有独立的 `CLAUDE_CONFIG_DIR` 或不同 Windows 用户时，应分别发现，不能假定共用。
 
 查找`claude-code-sessions/<account>/<org>/local_<UUID>.json`：这是桌面会话元数据，包含title、cliSessionId、cwd、时间、归档状态；JSONL完整存在也不代表桌面会显示。保留整层原件到私有备份，按cliSessionId关联主日志。元数据比日志多时逐条报告；源日志已经清理/不可用的记录不能声称已恢复正文。
 
 不同账号/模式不能直接照搬account/org目录。先从B当前config的lastKnownAccountUuid以及已有profile-origin标记确认目标命名空间；不确定时暂停桌面层apply。仅把真实源会话记录追加到目标目录，保留title/UUID/时间/归档状态，不携带A的账户、OAuth、设备标识、权限授予、自动模式、定时任务或会话内远端MCP密钥。原始快照保存在备份，不伪造不存在的会话或数据库。缺失主日志的记录标为不可用并列报告。B已有同ID记录按完整单元隔离，不能覆盖。
 
 应用后须重启桌面实际验证列表与正文；CLI可用或记录文件存在都不替代UI验收。跨模式/版本兼容是实测结果，不承诺所有版本均支持。
+
+### 核验桌面“Import N Claude Code CLI sessions”
+
+这个按钮只表示当前桌面版本发现了 N 条候选，不能视为从 A 导入 N 条，也不能据此宣称此前缺少桌面元数据的 A 会话已经出现。点击前按 B 当前模式的真实 `<account>/<org>` 目录建立逐文件 SHA-256 快照；点击后按文件名计算新增、缺失和原文件哈希变化。解析新增记录的 `cliSessionId`、`cwd`、标题和时间，按 `cliSessionId` 在实际 `.claude/projects` 全部项目目录下查找同 UUID 的主 JSONL，而不是只用 `cwd` 猜测一个编码目录。确认正文中至少存在对应会话的用户记录；只按文件名存在不能保证正文可用。
+
+分别统计新增中的 A 映射项目和 B 原有项目、重复的 `cliSessionId`、已存在的记录以及缺失正文。候选数与新增数可能不同；差额应查明或标为未知。保留每个原 B 文件及其哈希，不因导入结果重写或补造记录。最后在桌面 UI 打开一条 A 旧会话和一条 B 原会话，核对标题、正文、时间、cwd 和能否继续；窗口无法读取时明确标记 UI 未实测。源端没有列表元数据的 A JSONL 即使能在 CLI resume，也可能不出现在桌面列表，不能借用 B 的记录或改 UUID 来制造索引。
 
 ### 第三方API与官方订阅登录的区别
 

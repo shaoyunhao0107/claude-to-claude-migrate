@@ -50,7 +50,8 @@ with tempfile.TemporaryDirectory(prefix="claude-transfer-test-") as tmp:
     (project_a / "empty-folder").mkdir()
     selection = put(root, "projects.json", json.dumps([{"source": str(project_a)}]).encode())
     map_obj = json.loads(mapping.read_bytes())
-    map_obj["workspaces"] = {str(project_a): str(project_b)}
+    # Path.resolve() normalizes Windows 8.3 short paths used by tempfile.
+    map_obj["workspaces"] = {str(project_a.resolve()): str(project_b.resolve())}
     mapping.write_bytes(m.dump(map_obj))
     export = root / "export"
     m.export_bundle(SimpleNamespace(profile=a, config_dir=ac, out=export, projects=selection))

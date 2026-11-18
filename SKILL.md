@@ -49,4 +49,6 @@ python migrate.py apply --bundle <迁移包.zip> --profile <B用户目录> --con
 
 核对应用报告及包哈希、全部主会话 UUID 和明确标题、附属文件数量、B 原有文件未被替换、重复运行新增为零。打开 B 的原会话和 A 的至少一条旧会话，核对标题、消息、时间、目录、memory；检查 Skills 可发现、MCP 实际连通和插件依赖。桌面 Code 标签页必须实际显示并可继续；CLI `claude --resume` 可用不代表桌面 UI 一定收录。
 
+同一 Windows 用户的 Claude Code CLI 主历史通常在实际 `CLAUDE_CONFIG_DIR`（默认 `~/.claude/projects`）下；官方订阅 CLI 和第三方 API CLI 不应仅凭登录方式推断为两套历史。桌面 Code 的列表索引另存于当前应用资料区，不同模式可能有不同索引。定位实际目录和验证 CLI 导入按钮的办法见 [桌面 Code 列表](references/workflow.md#桌面code列表的第二层原生数据)。导入按钮显示的候选数不是写入数，也不能证明 A 的缺失记录已收录。
+
 只在所有目标项通过时称“全部迁移完成”。将冲突、重登、依赖缺失、未复制项目、桌面未显示列为待办。重复运行对变更了的既有 UUID 仍隔离，不做双向同步或历史覆盖。

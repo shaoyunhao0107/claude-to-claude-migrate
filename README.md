@@ -55,6 +55,10 @@ python scripts/migrate.py apply --bundle <包.zip> --profile <B用户目录> --c
 
 本地JSONL、源码、memory和Skills的迁移原则相同，但桌面存储位置及账户/组织命名空间可能不同。第三方API模式可能位于 `Claude-3p`，官方登录可能位于 `Claude-Data` 等实际资料区；目录名是线索，不能硬编码判断。
 
+一次 Windows 打包版实测中，CLI 主历史位于 `%USERPROFILE%\.claude\projects`，3p 桌面 Code 列表位于 `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Local\Claude-3p\claude-code-sessions`，官方桌面列表位于 `%LOCALAPPDATA%\Claude-Data\claude_pzs8sxrjxfjjc\claude-code-sessions`。这些桌面目录存的是列表元数据，正文仍须关联 `.claude\projects` 中的 JSONL；外层 `%LOCALAPPDATA%\Claude-3p` 可能只有配置。见 [路径与导入核验](references/workflow.md#桌面code列表的第二层原生数据)。
+
+桌面提示“Import N Claude Code CLI sessions”时，N 是候选数，不是实际新增数，更不能证明来自 A。点击前后应对当前模式的列表逐文件比较哈希，并按 `cliSessionId` 核对正文和来源项目；桌面内打开与续聊仍需单独实测。
+
 官方订阅目标先自行登录并初始化Code，再读取B实际生成的account/org。不照搬A身份目录，不复制OAuth、Cookies或API凭据来替换B登录。MCP仍需自己的授权，续聊模型也须由B当前登录方式支持。
 
 本次实机测试为第三方API目标模式；官方订阅跨模式桌面UI兼容尚未实测，因此必须另行验收。此流程不是向官方账号云端上传聊天，也不含claude.ai普通网页聊天和云端专属附件。
